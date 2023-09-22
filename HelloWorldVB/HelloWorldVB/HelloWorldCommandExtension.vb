@@ -211,8 +211,8 @@ Namespace HelloWorld
                     Dim revisionDef As PropDef = Nothing
                     Dim revisionProps As PropInst() = Nothing
                     Dim revisionProp As PropInst = Nothing
-                    Dim FileName As String
-                    Dim ItemName As String
+                    Dim fileName As String
+                    Dim itemName As String
                     Dim Revision As String
 
 
@@ -225,8 +225,8 @@ Namespace HelloWorld
                         revisionProp = revisionProps.First()
                         ' Mostrar el valor de la propiedad "Revision"
                         ' MessageBox.Show(selectedFile.Name & " - " & revisionProp.Val.ToString())
-                        FileName = selectedFile.Name
-                        FileName = Left(FileName, Len(FileName) - 4)
+                        fileName = selectedFile.Name
+                        fileName = Left(fileName, Len(fileName) - 4)
                         Revision = revisionProp.Val.ToString()
                         'MessageBox.Show(FileName, "FileName")
                         'MessageBox.Show(Revision, "Num rev")
@@ -241,25 +241,31 @@ Namespace HelloWorld
                         revisionProp = revisionProps.First()
                         ' Mostrar el valor de la propiedad "Revision"
                         ' MessageBox.Show(selectedFile.Name & " - " & revisionProp.Val.ToString())
-                        FileName = selectedFile.Name
-                        FileName = Left(FileName, Len(FileName) - 4)
+                        fileName = selectedFile.Name
+                        fileName = Left(fileName, Len(fileName) - 4)
                         Revision = revisionProp.Val.ToString()
                         ' MessageBox.Show(FileName, "FileName")
                         ' MessageBox.Show(Revision, "Num rev")
                         Dim RutaFija As String = "R:\DTECNIC\PLANOS\0_PNG\"
-                        Dim Dir3 As String = Left(FileName, 3) & "\"
-                        Dim Dir7 As String = Left(FileName, 7) & "\"
+                        Dim Dir3 As String = Left(fileName, 3) & "\"
+                        Dim Dir7 As String = Left(fileName, 7) & "\"
                         Dim LongRevision As Integer
                         Dim RutaImagen As String
                         LongRevision = Len(Revision)
                         ' MessageBox.Show(LongRevision, "LongRevision")
                         If LongRevision = 1 Then
-                            RutaImagen = RutaFija & Dir3 & Dir7 & FileName & "_R0" & Revision & ".png"
+                            RutaImagen = RutaFija & Dir3 & Dir7 & fileName & "_R0" & Revision & ".png"
                         Else
-                            RutaImagen = RutaFija & Dir3 & Dir7 & FileName & "_R" & Revision & ".png"
+                            RutaImagen = RutaFija & Dir3 & Dir7 & fileName & "_R" & Revision & ".png"
                         End If
                         ' MessageBox.Show(RutaImagen, "Ruta imagen")
                         ' Dim rutaImagen As String = "C:\IMG\0_PNG\A10\A10.019\A10.019780.AACZYR_R0A.png"
+
+                        Dim proc = Process.GetProcessesByName("Rundll32")
+                        For i As Integer = 0 To proc.Count - 1
+                            proc(i).CloseMainWindow()
+                        Next i
+
                         Dim proceso As New Process()
                         proceso.StartInfo.FileName = "C:\Windows\System32\rundll32.exe"
                         proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & RutaImagen
@@ -267,7 +273,7 @@ Namespace HelloWorld
 
                     ElseIf selection.TypeId = SelectionTypeId.Item Then
                         ' our ISelection.Id is really a Item.MasterId
-                        MessageBox.Show(selection.Label, "selectedItem")
+                        ' MessageBox.Show(selection.Label, "selectedItem")
                         selectedItem = mgr.ItemService.GetLatestItemByItemNumber(selection.Label)
 
                         ' Encontrar la definición de propiedad "Revision" para modelo ITEM
@@ -275,53 +281,44 @@ Namespace HelloWorld
                         revisionProps = mgr.PropertyService.GetProperties("ITEM", New Long() {selectedItem.Id}, New Long() {revisionDef.Id})
                         revisionProp = revisionProps.First()
                         ' Mostrar el valor de la propiedad "Revision"
-                        MessageBox.Show(selectedItem.ItemNum & " - " & revisionProp.Val.ToString())
-                        ItemName = selectedItem.ItemNum
-                        ItemName = Left(ItemName, Len(ItemName) - 4)
+                        ' MessageBox.Show(selectedItem.ItemNum & " - " & revisionProp.Val.ToString())
+                        itemName = selectedItem.ItemNum
+                        'itemName = Left(itemName, Len(itemName) - 4)
+
                         Revision = revisionProp.Val.ToString()
-                        MessageBox.Show(ItemName, "ItemName")
-                        MessageBox.Show(Revision, "Num rev")
+                        ' MessageBox.Show(itemName, "ItemName")
+                        ' MessageBox.Show(Revision, "Num rev")
 
+                        Dim RutaFija As String = "R:\DTECNIC\PLANOS\0_PNG\"
+                        Dim Dir3 As String = Left(itemName, 3) & "\"
+                        Dim Dir7 As String = Left(itemName, 7) & "\"
+                        Dim LongRevision As Integer
+                        Dim RutaImagen As String
+                        LongRevision = Len(Revision)
+                        ' MessageBox.Show(LongRevision, "LongRevision")
+                        If LongRevision = 1 Then
+                            RutaImagen = RutaFija & Dir3 & Dir7 & itemName & "_R0" & Revision & ".png"
+                        Else
+                            RutaImagen = RutaFija & Dir3 & Dir7 & itemName & "_R" & Revision & ".png"
+                        End If
 
-                    End If
-
-                    If selectedFile Is Nothing Then
-                        MessageBox.Show("La selección no es un fichero.")
-                    Else
-                        ' this is the message we hope to see
-                        ' MessageBox.Show([String].Format("Hello World! The file size is: {0} bytes", selectedFile.FileSize))
                         Dim proc = Process.GetProcessesByName("Rundll32")
                         For i As Integer = 0 To proc.Count - 1
                             proc(i).CloseMainWindow()
                         Next i
-                        ' this is the message we hope to see
-                        ' MessageBox.Show([String].Format("{0} - {1}", selectedFile.Name, selectedFile.))
-                        Dim RutaFija As String = "R:\DTECNIC\PLANOS\0_PNG\"
-                        Dim Dir3 As String = Left(FileName, 3) & "\"
-                        Dim Dir7 As String = Left(FileName, 7) & "\"
-                        Dim LongRevision As Integer
-                        Dim RutaImagen As String
 
-                        LongRevision = Len(Revision)
-
-                        If LongRevision = 1 Then
-
-                            RutaImagen = RutaFija & Dir3 & Dir7 & FileName & "_R0" & Revision & ".png"
-
-                        Else
-                            RutaImagen = RutaFija & Dir3 & Dir7 & FileName & "_R" & Revision & ".png"
-
-                        End If
-
-                        ' Dim rutaImagen As String = "C:\IMG\0_PNG\A10\A10.019\A10.019780.AACZYR_R0A.png"
                         Dim proceso As New Process()
                         proceso.StartInfo.FileName = "C:\Windows\System32\rundll32.exe"
                         proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & RutaImagen
                         proceso.Start()
 
-
-
                     End If
+
+                    'If selectedFile Is Nothing Then
+                    '    MessageBox.Show("La selección no es un fichero.")
+                    'End If
+
+
                 End If
             Catch ex As Exception
                 ' If something goes wrong, we don't want the exception to bubble up to Vault Explorer.
