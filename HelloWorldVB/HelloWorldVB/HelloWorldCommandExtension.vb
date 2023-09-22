@@ -1,17 +1,4 @@
-﻿'=====================================================================
-'  
-'  This file is part of the Autodesk Vault API Code Samples.
-'
-'  Copyright (C) Autodesk Inc.  All rights reserved.
-'
-'THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY
-'KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
-'IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
-'PARTICULAR PURPOSE.
-'=====================================================================
-
-
-Imports System.Collections.Generic
+﻿Imports System.Collections.Generic
 Imports System.Linq
 Imports System.Reflection
 Imports System.Windows.Forms
@@ -33,7 +20,6 @@ Imports VDF = Autodesk.DataManagement.Client.Framework
 
 ' This number gets incremented for each Vault release.
 <Assembly: Autodesk.Connectivity.Extensibility.Framework.ApiVersion("17.0")>
-
 
 Namespace HelloWorld
 
@@ -58,7 +44,7 @@ Namespace HelloWorld
             ' this command is not active if there are multiple entities selected
             'Dim helloWorldCmdItem As New CommandItem("HelloWorldCommand", "Hello World...") With { _
             Dim helloWorldCmdItem As New CommandItem("HelloWorldCommand", "Visor") With {
-            .NavigationTypes = New SelectionTypeId() {SelectionTypeId.File, SelectionTypeId.FileVersion},
+            .NavigationTypes = New SelectionTypeId() {SelectionTypeId.File, SelectionTypeId.FileVersion, SelectionTypeId.Item, SelectionTypeId.Bom},
              .MultiSelectEnabled = False
             }
 
@@ -79,12 +65,20 @@ Namespace HelloWorld
             }
             fileContextCmdSite.AddCommand(helloWorldCmdItem)
 
+            ' Create another command site to hook the command to the right-click menu for Items.
+            Dim itemContextCmdSite As New CommandSite("HelloWorldCommand.ItemContextMenu", "Hello World Menu") With {
+             .Location = CommandSiteLocation.ItemContextMenu,
+             .DeployAsPulldownMenu = False
+            }
+            itemContextCmdSite.AddCommand(helloWorldCmdItem)
+
             ' Now the custom command is available in 2 places.
 
             ' Gather the sites in a List.
             Dim sites As New List(Of CommandSite)()
             sites.Add(toolbarCmdSite)
             sites.Add(fileContextCmdSite)
+            sites.Add(itemContextCmdSite)
 
             ' Return the list of CommandSites.
             Return sites
@@ -208,31 +202,29 @@ Namespace HelloWorld
                     MessageBox.Show("Esta función no soporta selecciones múltiples")
                 Else
                     ' we only have one item selected, which is the expected behavior
-
                     Dim selection As ISelection = e.Context.CurrentSelectionSet.First()                   
                     Dim mgr As WebServiceManager = e.Context.Application.Connection.WebServiceManager
 
                     ' Look of the File object.  How we do this depends on what is selected.
                     Dim selectedFile As File = Nothing
+                    Dim selectedItem As Item = Nothing
                     Dim revisionDef As PropDef = Nothing
                     Dim revisionProps As PropInst() = Nothing
                     Dim revisionProp As PropInst = Nothing
                     Dim FileName As String
+                    Dim ItemName As String
                     Dim Revision As String
 
 
                     If selection.TypeId = SelectionTypeId.File Then
                         ' our ISelection.Id is really a File.MasterId
                         selectedFile = mgr.DocumentService.GetLatestFileByMasterId(selection.Id)
-
                         ' Encontrar la definición de propiedad "Revision" para archivos FILE
                         revisionDef = mgr.PropertyService.FindPropertyDefinitionsBySystemNames("FILE", New String() {"Revision"}).First()
                         revisionProps = mgr.PropertyService.GetProperties("FILE", New Long() {selectedFile.Id}, New Long() {revisionDef.Id})
                         revisionProp = revisionProps.First()
-
                         ' Mostrar el valor de la propiedad "Revision"
-                        'MessageBox.Show(selectedFile.Name & " - " & revisionProp.Val.ToString())
-
+                        ' MessageBox.Show(selectedFile.Name & " - " & revisionProp.Val.ToString())
                         FileName = selectedFile.Name
                         FileName = Left(FileName, Len(FileName) - 4)
                         Revision = revisionProp.Val.ToString()
@@ -242,49 +234,53 @@ Namespace HelloWorld
                     ElseIf selection.TypeId = SelectionTypeId.FileVersion Then
                         ' our ISelection.Id is really a File.Id
                         selectedFile = mgr.DocumentService.GetFileById(selection.Id)
-                        'MessageBox.Show("Eureka")
-
+                        ' MessageBox.Show("Eureka")
                         ' Encontrar la definición de propiedad "Revision" para archivos FILE
                         revisionDef = mgr.PropertyService.FindPropertyDefinitionsBySystemNames("FILE", New String() {"Revision"}).First()
                         revisionProps = mgr.PropertyService.GetProperties("FILE", New Long() {selectedFile.Id}, New Long() {revisionDef.Id})
                         revisionProp = revisionProps.First()
-
                         ' Mostrar el valor de la propiedad "Revision"
                         ' MessageBox.Show(selectedFile.Name & " - " & revisionProp.Val.ToString())
-
                         FileName = selectedFile.Name
                         FileName = Left(FileName, Len(FileName) - 4)
                         Revision = revisionProp.Val.ToString()
-                        'MessageBox.Show(FileName, "FileName")
+                        ' MessageBox.Show(FileName, "FileName")
                         ' MessageBox.Show(Revision, "Num rev")
-
-
                         Dim RutaFija As String = "R:\DTECNIC\PLANOS\0_PNG\"
                         Dim Dir3 As String = Left(FileName, 3) & "\"
                         Dim Dir7 As String = Left(FileName, 7) & "\"
                         Dim LongRevision As Integer
                         Dim RutaImagen As String
-
                         LongRevision = Len(Revision)
-                        'MessageBox.Show(LongRevision, "LongRevision")
-
-
+                        ' MessageBox.Show(LongRevision, "LongRevision")
                         If LongRevision = 1 Then
-
                             RutaImagen = RutaFija & Dir3 & Dir7 & FileName & "_R0" & Revision & ".png"
-
                         Else
                             RutaImagen = RutaFija & Dir3 & Dir7 & FileName & "_R" & Revision & ".png"
-
                         End If
-
-                        'MessageBox.Show(RutaImagen, "Ruta imagen")
-
+                        ' MessageBox.Show(RutaImagen, "Ruta imagen")
                         ' Dim rutaImagen As String = "C:\IMG\0_PNG\A10\A10.019\A10.019780.AACZYR_R0A.png"
                         Dim proceso As New Process()
                         proceso.StartInfo.FileName = "C:\Windows\System32\rundll32.exe"
                         proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & RutaImagen
                         proceso.Start()
+
+                    ElseIf selection.TypeId = SelectionTypeId.Item Then
+                        ' our ISelection.Id is really a Item.MasterId
+                        MessageBox.Show(selection.Label, "selectedItem")
+                        selectedItem = mgr.ItemService.GetLatestItemByItemNumber(selection.Label)
+
+                        ' Encontrar la definición de propiedad "Revision" para modelo ITEM
+                        revisionDef = mgr.PropertyService.FindPropertyDefinitionsBySystemNames("ITEM", New String() {"RevNumber"}).First()
+                        revisionProps = mgr.PropertyService.GetProperties("ITEM", New Long() {selectedItem.Id}, New Long() {revisionDef.Id})
+                        revisionProp = revisionProps.First()
+                        ' Mostrar el valor de la propiedad "Revision"
+                        MessageBox.Show(selectedItem.ItemNum & " - " & revisionProp.Val.ToString())
+                        ItemName = selectedItem.ItemNum
+                        ItemName = Left(ItemName, Len(ItemName) - 4)
+                        Revision = revisionProp.Val.ToString()
+                        MessageBox.Show(ItemName, "ItemName")
+                        MessageBox.Show(Revision, "Num rev")
 
 
                     End If
