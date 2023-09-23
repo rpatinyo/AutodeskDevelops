@@ -219,16 +219,7 @@ Namespace HelloWorld
                             rutaImagen = rutaFija & dirTres & dirSiete & fileName & "_R" & revisionNumber & ".png"
                         End If
 
-                        ' Verificar si el archivo de imagen existe en rutaImagen
-                        If System.IO.File.Exists(rutaImagen) Then
-                            Dim proceso As New Process()
-                            proceso.StartInfo.FileName = "C:\Windows\System32\rundll32.exe"
-                            proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & rutaImagen
-                            proceso.Start()
-                        Else
-                            ' El archivo de imagen no existe, mostrar un mensaje o realizar otra acción
-                            MessageBox.Show("NO EXISTE IMAGEN DEL PLANO.", "IMAGEN NO ENCONTRADA", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                        End If
+                        CheckPicturePath(rutaImagen)
 
                     ElseIf selection.TypeId = SelectionTypeId.FileVersion Then
                         ' our ISelection.Id is really a File.Id
@@ -254,17 +245,7 @@ Namespace HelloWorld
                             rutaImagen = rutaFija & dirTres & dirSiete & fileName & "_R" & revisionNumber & ".png"
                         End If
 
-                        ' Verificar si el archivo de imagen existe en rutaImagen
-                        If System.IO.File.Exists(rutaImagen) Then
-                            ' El archivo de imagen existe, ejecutar el visor de imágenes
-                            Dim proceso As New Process()
-                            proceso.StartInfo.FileName = "C:\Windows\System32\rundll32.exe"
-                            proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & rutaImagen
-                            proceso.Start()
-                        Else
-                            ' El archivo de imagen no existe, mostrar un mensaje o realizar otra acción
-                            MessageBox.Show("NO EXISTE IMAGEN DEL PLANO.", "IMAGEN NO ENCONTRADA", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                        End If
+                        CheckPicturePath(rutaImagen)
 
                     ElseIf selection.TypeId = SelectionTypeId.Item Then
                         ' our ISelection.Id is really a Item.MasterId
@@ -285,16 +266,7 @@ Namespace HelloWorld
                             rutaImagen = rutaFija & dirTres & dirSiete & itemName & "_R" & revisionNumber & ".png"
                         End If
 
-                        ' Verificar si el archivo de imagen existe en rutaImagen
-                        If System.IO.File.Exists(rutaImagen) Then
-                            Dim proceso As New Process()
-                            proceso.StartInfo.FileName = "C:\Windows\System32\rundll32.exe"
-                            proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & rutaImagen
-                            proceso.Start()
-                        Else
-                            ' El archivo de imagen no existe, mostrar un mensaje o realizar otra acción
-                            MessageBox.Show("NO EXISTE IMAGEN DEL PLANO.", "IMAGEN NO ENCONTRADA", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                        End If
+                        CheckPicturePath(rutaImagen)
 
                     ElseIf selection.TypeId = SelectionTypeId.Bom Then
                         selectedItem = mgr.ItemService.GetLatestItemByItemNumber(selection.Label)
@@ -313,17 +285,7 @@ Namespace HelloWorld
                             rutaImagen = rutaFija & dirTres & dirSiete & itemName & "_R" & revisionNumber & ".png"
                         End If
 
-                        ' Verificar si el archivo de imagen existe en rutaImagen
-                        If System.IO.File.Exists(rutaImagen) Then
-                            ' El archivo de imagen existe, ejecutar el visor de imágenes
-                            Dim proceso As New Process()
-                            proceso.StartInfo.FileName = "C:\Windows\System32\rundll32.exe"
-                            proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & rutaImagen
-                            proceso.Start()
-                        Else
-                            ' El archivo de imagen no existe, mostrar un mensaje o realizar otra acción
-                            MessageBox.Show("NO EXISTE IMAGEN DEL PLANO.", "IMAGEN NO ENCONTRADA", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                        End If
+                        CheckPicturePath(rutaImagen)
 
                     End If
 
@@ -336,6 +298,20 @@ Namespace HelloWorld
                 ' If something goes wrong, we don't want the exception to bubble up to Vault Explorer.
                 MessageBox.Show("Error: " & ex.Message)
             End Try
+        End Sub
+
+        Private Sub CheckPicturePath(rutaImagen As String)
+            ' Verificar si el archivo de imagen existe en rutaImagen
+            If System.IO.File.Exists(rutaImagen) Then
+                ' El archivo de imagen existe, ejecutar el visor de imágenes
+                Dim proceso As New Process()
+                proceso.StartInfo.FileName = "C:\Windows\System32\rundll32.exe"
+                proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & rutaImagen
+                proceso.Start()
+            Else
+                ' El archivo de imagen no existe, mostrar un mensaje o realizar otra acción
+                MessageBox.Show("NO EXISTE IMAGEN DEL PLANO.", "IMAGEN NO ENCONTRADA", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            End If
         End Sub
 
     End Class
