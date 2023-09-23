@@ -10,9 +10,9 @@ Imports VDF = Autodesk.DataManagement.Client.Framework
 
 
 ' These 5 assembly attributes must be specified or your extension will not load. 
-<Assembly: AssemblyCompany("Autodesk")> 
-<Assembly: AssemblyProduct("HelloWorldCommandExtension")> 
-<Assembly: AssemblyDescription("Sample App")> 
+<Assembly: AssemblyCompany("Autodesk")>
+<Assembly: AssemblyProduct("HelloWorldCommandExtension")>
+<Assembly: AssemblyDescription("Sample App")>
 
 ' The extension ID needs to be unique for each extension.  
 ' Make sure to generate your own ID when writing your own extension. 
@@ -42,36 +42,42 @@ Namespace HelloWorld
             ' this command is active when a File is selected
 
             ' this command is not active if there are multiple entities selected
-            'Dim helloWorldCmdItem As New CommandItem("HelloWorldCommand", "Hello World...") With { _
             Dim helloWorldCmdItem As New CommandItem("HelloWorldCommand", "Visor") With {
-            .NavigationTypes = New SelectionTypeId() {SelectionTypeId.File, SelectionTypeId.FileVersion, SelectionTypeId.Item, SelectionTypeId.Bom},
-             .MultiSelectEnabled = False
+                .NavigationTypes = New SelectionTypeId() {SelectionTypeId.File, SelectionTypeId.FileVersion, SelectionTypeId.Item, SelectionTypeId.Bom},
+                .MultiSelectEnabled = False
             }
 
             ' The HelloWorldCommandHandler function is called when the custom command is executed.
             AddHandler helloWorldCmdItem.Execute, AddressOf HelloWorldCommandHandler
 
             ' Create a command site to hook the command to the Advanced toolbar
-            Dim toolbarCmdSite As New CommandSite("HelloWorldCommand.Toolbar", "Hello World Menu") With { _
-             .Location = CommandSiteLocation.AdvancedToolbar, _
-             .DeployAsPulldownMenu = False _
+            Dim toolbarCmdSite As New CommandSite("HelloWorldCommand.Toolbar", "Visor") With {
+             .Location = CommandSiteLocation.AdvancedToolbar,
+             .DeployAsPulldownMenu = False
             }
             toolbarCmdSite.AddCommand(helloWorldCmdItem)
 
             ' Create another command site to hook the command to the right-click menu for Files.
-            Dim fileContextCmdSite As New CommandSite("HelloWorldCommand.FileContextMenu", "Hello World Menu") With { _
-             .Location = CommandSiteLocation.FileContextMenu, _
-             .DeployAsPulldownMenu = False _
+            Dim fileContextCmdSite As New CommandSite("HelloWorldCommand.FileContextMenu", "Visor") With {
+             .Location = CommandSiteLocation.FileContextMenu,
+             .DeployAsPulldownMenu = False
             }
             fileContextCmdSite.AddCommand(helloWorldCmdItem)
 
-            ' Now the custom command is available in 2 places.
+            ' Create another command site to hook the command to the right-click menu for Items.
+            Dim itemContextCmdSite As New CommandSite("HelloWorldCommand.ItemContextMenu ", "Visor") With {
+             .Location = CommandSiteLocation.ItemContextMenu,
+             .DeployAsPulldownMenu = False
+            }
+            itemContextCmdSite.AddCommand(helloWorldCmdItem)
+
+            ' Now the custom command is available in 3 places.
 
             'Gather the sites in a List.
             Dim sites As New List(Of CommandSite)()
             sites.Add(toolbarCmdSite)
             sites.Add(fileContextCmdSite)
-            ' sites.Add(itemContextCmdSite)
+            sites.Add(itemContextCmdSite)
 
             ' Return the list of CommandSites.
             Return sites
@@ -97,7 +103,7 @@ Namespace HelloWorld
         ''' </summary>
         ''' <param name="application">Provides information about the running application.</param>
         Public Sub OnLogOn(application As IApplication) Implements IExplorerExtension.OnLogOn
-            
+
         End Sub
 
         ''' <summary>
@@ -106,7 +112,7 @@ Namespace HelloWorld
         ''' </summary>
         ''' <param name="application">Provides information about the running application.</param>
         Public Sub OnLogOff(application As IApplication) Implements IExplorerExtension.OnLogOff
-            
+
         End Sub
 
         ''' <summary>
