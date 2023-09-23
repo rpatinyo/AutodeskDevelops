@@ -159,6 +159,9 @@ Namespace HelloWorld
         ''' <param name="s">The sender object.  Usually not used.</param>
         ''' <param name="e">The event args.  Provides additional information about the environment.</param>
         Private Sub HelloWorldCommandHandler(s As Object, e As CommandItemEventArgs)
+
+
+
             Try
                 ' The Context part of the event args tells us information about what is selected.
                 ' Run some checks to make sure that the selection is valid.
@@ -174,19 +177,24 @@ Namespace HelloWorld
                         proc(i).CloseMainWindow()
                     Next i
 
-                    ' we only have one item selected, which is the expected behavior
-                    Dim selection As ISelection = e.Context.CurrentSelectionSet.First()                   
+                    ' We only have one item selected, which is the expected behavior
+                    Dim selection As ISelection = e.Context.CurrentSelectionSet.First()
                     Dim mgr As WebServiceManager = e.Context.Application.Connection.WebServiceManager
 
-                    ' Look of the File object.  How we do this depends on what is selected.
+                    ' Look of the File or Item object. How we do this depends on what is selected.
                     Dim selectedFile As File = Nothing
                     Dim selectedItem As Item = Nothing
                     Dim revisionDef As PropDef = Nothing
                     Dim revisionProps As PropInst() = Nothing
                     Dim revisionProp As PropInst = Nothing
-                    Dim fileName As String
-                    Dim itemName As String
-                    Dim Revision As String
+                    Dim fileName As String = Nothing
+                    Dim itemName As String = Nothing
+                    Dim revisionNumber As String = Nothing
+                    Dim rutaFija As String = "R:\DTECNIC\PLANOS\0_PNG\"
+                    Dim dirTres As String = Nothing
+                    Dim dirSiete As String = Nothing
+                    Dim longRevision As Integer = Nothing
+                    Dim rutaImagen As String = Nothing
 
                     If selection.TypeId = SelectionTypeId.File Then
                         ' our ISelection.Id is really a File.MasterId
@@ -198,29 +206,24 @@ Namespace HelloWorld
                         ' Mostrar el valor de la propiedad "Revision"
                         fileName = selectedFile.Name
                         fileName = Left(fileName, Len(fileName) - 4)
-                        Revision = revisionProp.Val.ToString()
-
-                        If Revision = "" Then
-                            Revision = "10"
+                        revisionNumber = revisionProp.Val.ToString()
+                        If revisionNumber = "" Then
+                            revisionNumber = "10"
                         End If
-
-                        Dim RutaFija As String = "R:\DTECNIC\PLANOS\0_PNG\"
-                        Dim Dir3 As String = Left(fileName, 3) & "\"
-                        Dim Dir7 As String = Left(fileName, 7) & "\"
-                        Dim LongRevision As Integer
-                        Dim RutaImagen As String
-                        LongRevision = Len(Revision)
-                        If LongRevision = 1 Then
-                            RutaImagen = RutaFija & Dir3 & Dir7 & fileName & "_R0" & Revision & ".png"
+                        dirTres = Left(fileName, 3) & "\"
+                        dirSiete = Left(fileName, 7) & "\"
+                        longRevision = Len(revisionNumber)
+                        If longRevision = 1 Then
+                            rutaImagen = rutaFija & dirTres & dirSiete & fileName & "_R0" & revisionNumber & ".png"
                         Else
-                            RutaImagen = RutaFija & Dir3 & Dir7 & fileName & "_R" & Revision & ".png"
+                            rutaImagen = rutaFija & dirTres & dirSiete & fileName & "_R" & revisionNumber & ".png"
                         End If
 
-                        ' Verificar si el archivo de imagen existe en RutaImagen
-                        If System.IO.File.Exists(RutaImagen) Then
+                        ' Verificar si el archivo de imagen existe en rutaImagen
+                        If System.IO.File.Exists(rutaImagen) Then
                             Dim proceso As New Process()
                             proceso.StartInfo.FileName = "C:\Windows\System32\rundll32.exe"
-                            proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & RutaImagen
+                            proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & rutaImagen
                             proceso.Start()
                         Else
                             ' El archivo de imagen no existe, mostrar un mensaje o realizar otra acción
@@ -236,30 +239,27 @@ Namespace HelloWorld
                         revisionProp = revisionProps.First()
                         fileName = selectedFile.Name
                         fileName = Left(fileName, Len(fileName) - 4)
-                        Revision = revisionProp.Val.ToString()
+                        revisionNumber = revisionProp.Val.ToString()
 
-                        If Revision = "" Then
-                            Revision = "10"
+                        If revisionNumber = "" Then
+                            revisionNumber = "10"
                         End If
 
-                        Dim RutaFija As String = "R:\DTECNIC\PLANOS\0_PNG\"
-                        Dim Dir3 As String = Left(fileName, 3) & "\"
-                        Dim Dir7 As String = Left(fileName, 7) & "\"
-                        Dim LongRevision As Integer
-                        Dim RutaImagen As String
-                        LongRevision = Len(Revision)
-                        If LongRevision = 1 Then
-                            RutaImagen = RutaFija & Dir3 & Dir7 & fileName & "_R0" & Revision & ".png"
+                        dirTres = Left(fileName, 3) & "\"
+                        dirSiete = Left(fileName, 7) & "\"
+                        longRevision = Len(revisionNumber)
+                        If longRevision = 1 Then
+                            rutaImagen = rutaFija & dirTres & dirSiete & fileName & "_R0" & revisionNumber & ".png"
                         Else
-                            RutaImagen = RutaFija & Dir3 & Dir7 & fileName & "_R" & Revision & ".png"
+                            rutaImagen = rutaFija & dirTres & dirSiete & fileName & "_R" & revisionNumber & ".png"
                         End If
 
-                        ' Verificar si el archivo de imagen existe en RutaImagen
-                        If System.IO.File.Exists(RutaImagen) Then
+                        ' Verificar si el archivo de imagen existe en rutaImagen
+                        If System.IO.File.Exists(rutaImagen) Then
                             ' El archivo de imagen existe, ejecutar el visor de imágenes
                             Dim proceso As New Process()
                             proceso.StartInfo.FileName = "C:\Windows\System32\rundll32.exe"
-                            proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & RutaImagen
+                            proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & rutaImagen
                             proceso.Start()
                         Else
                             ' El archivo de imagen no existe, mostrar un mensaje o realizar otra acción
@@ -275,24 +275,21 @@ Namespace HelloWorld
                         revisionProps = mgr.PropertyService.GetProperties("ITEM", New Long() {selectedItem.Id}, New Long() {revisionDef.Id})
                         revisionProp = revisionProps.First()
                         itemName = selectedItem.ItemNum
-                        Revision = revisionProp.Val.ToString()
-                        Dim RutaFija As String = "R:\DTECNIC\PLANOS\0_PNG\"
-                        Dim Dir3 As String = Left(itemName, 3) & "\"
-                        Dim Dir7 As String = Left(itemName, 7) & "\"
-                        Dim LongRevision As Integer
-                        Dim RutaImagen As String
-                        LongRevision = Len(Revision)
-                        If LongRevision = 1 Then
-                            RutaImagen = RutaFija & Dir3 & Dir7 & itemName & "_R0" & Revision & ".png"
+                        revisionNumber = revisionProp.Val.ToString()
+                        dirTres = Left(itemName, 3) & "\"
+                        dirSiete = Left(itemName, 7) & "\"
+                        longRevision = Len(revisionNumber)
+                        If longRevision = 1 Then
+                            rutaImagen = rutaFija & dirTres & dirSiete & itemName & "_R0" & revisionNumber & ".png"
                         Else
-                            RutaImagen = RutaFija & Dir3 & Dir7 & itemName & "_R" & Revision & ".png"
+                            rutaImagen = rutaFija & dirTres & dirSiete & itemName & "_R" & revisionNumber & ".png"
                         End If
 
-                        ' Verificar si el archivo de imagen existe en RutaImagen
-                        If System.IO.File.Exists(RutaImagen) Then
+                        ' Verificar si el archivo de imagen existe en rutaImagen
+                        If System.IO.File.Exists(rutaImagen) Then
                             Dim proceso As New Process()
                             proceso.StartInfo.FileName = "C:\Windows\System32\rundll32.exe"
-                            proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & RutaImagen
+                            proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & rutaImagen
                             proceso.Start()
                         Else
                             ' El archivo de imagen no existe, mostrar un mensaje o realizar otra acción
@@ -306,25 +303,22 @@ Namespace HelloWorld
                         revisionProps = mgr.PropertyService.GetProperties("ITEM", New Long() {selectedItem.Id}, New Long() {revisionDef.Id})
                         revisionProp = revisionProps.First()
                         itemName = selectedItem.ItemNum
-                        Revision = revisionProp.Val.ToString()
-                        Dim RutaFija As String = "R:\DTECNIC\PLANOS\0_PNG\"
-                        Dim Dir3 As String = Left(itemName, 3) & "\"
-                        Dim Dir7 As String = Left(itemName, 7) & "\"
-                        Dim LongRevision As Integer
-                        Dim RutaImagen As String
-                        LongRevision = Len(Revision)
-                        If LongRevision = 1 Then
-                            RutaImagen = RutaFija & Dir3 & Dir7 & itemName & "_R0" & Revision & ".png"
+                        revisionNumber = revisionProp.Val.ToString()
+                        dirTres = Left(itemName, 3) & "\"
+                        dirSiete = Left(itemName, 7) & "\"
+                        longRevision = Len(revisionNumber)
+                        If longRevision = 1 Then
+                            rutaImagen = rutaFija & dirTres & dirSiete & itemName & "_R0" & revisionNumber & ".png"
                         Else
-                            RutaImagen = RutaFija & Dir3 & Dir7 & itemName & "_R" & Revision & ".png"
+                            rutaImagen = rutaFija & dirTres & dirSiete & itemName & "_R" & revisionNumber & ".png"
                         End If
 
-                        ' Verificar si el archivo de imagen existe en RutaImagen
-                        If System.IO.File.Exists(RutaImagen) Then
+                        ' Verificar si el archivo de imagen existe en rutaImagen
+                        If System.IO.File.Exists(rutaImagen) Then
                             ' El archivo de imagen existe, ejecutar el visor de imágenes
                             Dim proceso As New Process()
                             proceso.StartInfo.FileName = "C:\Windows\System32\rundll32.exe"
-                            proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & RutaImagen
+                            proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & rutaImagen
                             proceso.Start()
                         Else
                             ' El archivo de imagen no existe, mostrar un mensaje o realizar otra acción
