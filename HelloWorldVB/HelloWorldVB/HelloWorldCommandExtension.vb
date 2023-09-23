@@ -65,20 +65,26 @@ Namespace HelloWorld
             }
             fileContextCmdSite.AddCommand(helloWorldCmdItem)
 
-            ' Create another command site to hook the command to the right-click menu for Items.
-            Dim itemContextCmdSite As New CommandSite("HelloWorldCommand.ItemContextMenu", "Hello World Menu") With {
-             .Location = CommandSiteLocation.ItemContextMenu,
-             .DeployAsPulldownMenu = False
-            }
-            itemContextCmdSite.AddCommand(helloWorldCmdItem)
-
             ' Now the custom command is available in 2 places.
 
-            ' Gather the sites in a List.
+
+
+            '        ' Create a command site for the Item context menu.
+            '        Dim itemContextCmdSite As New CommandSite("HelloWorldCommand.ItemContextMenu", "Hello World Menu") With {
+            '    .Location = CommandSiteLocation.ItemBomToolbar,
+            '    .DeployAsPulldownMenu = False ' Set this to True to make it a dropdown menu.
+            '}
+            '        itemContextCmdSite.AddCommand(helloWorldCmdItem)
+
+
+
+
+
+            'Gather the sites in a List.
             Dim sites As New List(Of CommandSite)()
             sites.Add(toolbarCmdSite)
             sites.Add(fileContextCmdSite)
-            sites.Add(itemContextCmdSite)
+            ' sites.Add(itemContextCmdSite)
 
             ' Return the list of CommandSites.
             Return sites
@@ -91,34 +97,34 @@ Namespace HelloWorld
         ''' </summary>
         ''' <returns>A collection of DetailTabs, each object represents a custom tab.</returns>
         Public Function DetailTabs() As IEnumerable(Of DetailPaneTab) Implements IExplorerExtension.DetailTabs
-            ' Create a DetailPaneTab list to return from method
-            Dim fileTabs As New List(Of DetailPaneTab)()
+            '' Create a DetailPaneTab list to return from method
+            'Dim fileTabs As New List(Of DetailPaneTab)()
 
-            ' Create Selection Info tab for Files
-            Dim filePropertyTab As New DetailPaneTab("File.Tab.PropertyGrid", "Selection Info", SelectionTypeId.File, GetType(MyCustomTabControl))
+            '' Create Selection Info tab for Files
+            'Dim filePropertyTab As New DetailPaneTab("File.Tab.PropertyGrid", "Selection Info", SelectionTypeId.File, GetType(MyCustomTabControl))
 
-            ' The propertyTab_SelectionChanged is called whenever our tab is active and the selection changes in the 
-            ' main grid.
-            AddHandler filePropertyTab.SelectionChanged, AddressOf propertyTab_SelectionChanged
-            fileTabs.Add(filePropertyTab)
+            '' The propertyTab_SelectionChanged is called whenever our tab is active and the selection changes in the 
+            '' main grid.
+            'AddHandler filePropertyTab.SelectionChanged, AddressOf propertyTab_SelectionChanged
+            'fileTabs.Add(filePropertyTab)
 
-            ' Create Selection Info tab for Folders
-            Dim folderPropertyTab As New DetailPaneTab("Folder.Tab.PropertyGrid", "Selection Info", SelectionTypeId.Folder, GetType(MyCustomTabControl))
-            AddHandler folderPropertyTab.SelectionChanged, AddressOf propertyTab_SelectionChanged
-            fileTabs.Add(folderPropertyTab)
+            '' Create Selection Info tab for Folders
+            'Dim folderPropertyTab As New DetailPaneTab("Folder.Tab.PropertyGrid", "Selection Info", SelectionTypeId.Folder, GetType(MyCustomTabControl))
+            'AddHandler folderPropertyTab.SelectionChanged, AddressOf propertyTab_SelectionChanged
+            'fileTabs.Add(folderPropertyTab)
 
-            ' Create Selection Info tab for Items
-            Dim itemPropertyTab As New DetailPaneTab("Item.Tab.PropertyGrid", "Selection Info", SelectionTypeId.Item, GetType(MyCustomTabControl))
-            AddHandler itemPropertyTab.SelectionChanged, AddressOf propertyTab_SelectionChanged
-            fileTabs.Add(itemPropertyTab)
+            '' Create Selection Info tab for Items
+            'Dim itemPropertyTab As New DetailPaneTab("Item.Tab.PropertyGrid", "Selection Info", SelectionTypeId.Item, GetType(MyCustomTabControl))
+            'AddHandler itemPropertyTab.SelectionChanged, AddressOf propertyTab_SelectionChanged
+            'fileTabs.Add(itemPropertyTab)
 
-            ' Create Selection Info tab for Change Orders
-            Dim coPropertyTab As New DetailPaneTab("Co.Tab.PropertyGrid", "Selection Info", SelectionTypeId.ChangeOrder, GetType(MyCustomTabControl))
-            AddHandler coPropertyTab.SelectionChanged, AddressOf propertyTab_SelectionChanged
-            fileTabs.Add(coPropertyTab)
+            '' Create Selection Info tab for Change Orders
+            'Dim coPropertyTab As New DetailPaneTab("Co.Tab.PropertyGrid", "Selection Info", SelectionTypeId.ChangeOrder, GetType(MyCustomTabControl))
+            'AddHandler coPropertyTab.SelectionChanged, AddressOf propertyTab_SelectionChanged
+            'fileTabs.Add(coPropertyTab)
 
-            ' Return tabs
-            Return fileTabs
+            '' Return tabs
+            'Return fileTabs
         End Function
 
 
@@ -216,6 +222,7 @@ Namespace HelloWorld
                     Dim Revision As String
 
 
+
                     If selection.TypeId = SelectionTypeId.File Then
                         ' our ISelection.Id is really a File.MasterId
                         selectedFile = mgr.DocumentService.GetLatestFileByMasterId(selection.Id)
@@ -231,21 +238,11 @@ Namespace HelloWorld
                         'MessageBox.Show(FileName, "FileName")
                         'MessageBox.Show(Revision, "Num rev")
 
-                    ElseIf selection.TypeId = SelectionTypeId.FileVersion Then
-                        ' our ISelection.Id is really a File.Id
-                        selectedFile = mgr.DocumentService.GetFileById(selection.Id)
-                        ' MessageBox.Show("Eureka")
-                        ' Encontrar la definición de propiedad "Revision" para archivos FILE
-                        revisionDef = mgr.PropertyService.FindPropertyDefinitionsBySystemNames("FILE", New String() {"Revision"}).First()
-                        revisionProps = mgr.PropertyService.GetProperties("FILE", New Long() {selectedFile.Id}, New Long() {revisionDef.Id})
-                        revisionProp = revisionProps.First()
-                        ' Mostrar el valor de la propiedad "Revision"
-                        ' MessageBox.Show(selectedFile.Name & " - " & revisionProp.Val.ToString())
-                        fileName = selectedFile.Name
-                        fileName = Left(fileName, Len(fileName) - 4)
-                        Revision = revisionProp.Val.ToString()
-                        ' MessageBox.Show(FileName, "FileName")
-                        ' MessageBox.Show(Revision, "Num rev")
+                        If Revision = "" Then
+                            Revision = "10"
+                        End If
+
+
                         Dim RutaFija As String = "R:\DTECNIC\PLANOS\0_PNG\"
                         Dim Dir3 As String = Left(fileName, 3) & "\"
                         Dim Dir7 As String = Left(fileName, 7) & "\"
@@ -266,10 +263,98 @@ Namespace HelloWorld
                             proc(i).CloseMainWindow()
                         Next i
 
-                        Dim proceso As New Process()
-                        proceso.StartInfo.FileName = "C:\Windows\System32\rundll32.exe"
-                        proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & RutaImagen
-                        proceso.Start()
+                        'Dim proceso As New Process()
+                        'proceso.StartInfo.FileName = "C:\Windows\System32\rundll32.exe"
+                        'proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & RutaImagen
+                        'proceso.Start()
+
+                        ' Verificar si el archivo de imagen existe en RutaImagen
+                        If System.IO.File.Exists(RutaImagen) Then
+                            ' El archivo de imagen existe, ejecutar el visor de imágenes
+                            Dim proceso As New Process()
+                            proceso.StartInfo.FileName = "C:\Windows\System32\rundll32.exe"
+                            proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & RutaImagen
+                            proceso.Start()
+                            'MessageBox.Show("Bloque de abajo.", "Bloque de abajo", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                        Else
+                            ' El archivo de imagen no existe, mostrar un mensaje o realizar otra acción
+                            MessageBox.Show("NO EXISTE IMAGEN DEL PLANO.", "IMAGEN NO ENCONTRADA", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                            ' MessageBox.Show("Bloque de abajo - else.", "Bloque de abajo - else", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                        End If
+
+
+
+
+
+
+
+
+
+                    ElseIf selection.TypeId = SelectionTypeId.FileVersion Then
+                        ' our ISelection.Id is really a File.Id
+                        selectedFile = mgr.DocumentService.GetFileById(selection.Id)
+                        ' MessageBox.Show("Eureka")
+                        ' Encontrar la definición de propiedad "Revision" para archivos FILE
+                        revisionDef = mgr.PropertyService.FindPropertyDefinitionsBySystemNames("FILE", New String() {"Revision"}).First()
+                        revisionProps = mgr.PropertyService.GetProperties("FILE", New Long() {selectedFile.Id}, New Long() {revisionDef.Id})
+                        revisionProp = revisionProps.First()
+                        ' Mostrar el valor de la propiedad "Revision"
+                        ' MessageBox.Show(selectedFile.Name & " - " & revisionProp.Val.ToString())
+                        fileName = selectedFile.Name
+                        fileName = Left(fileName, Len(fileName) - 4)
+                        Revision = revisionProp.Val.ToString()
+                        ' MessageBox.Show(FileName, "FileName")
+                        ' MessageBox.Show(Revision, "Num rev")
+
+                        If Revision = "" Then
+                            Revision = "10"
+                        End If
+
+                        Dim RutaFija As String = "R:\DTECNIC\PLANOS\0_PNG\"
+                        Dim Dir3 As String = Left(fileName, 3) & "\"
+                        Dim Dir7 As String = Left(fileName, 7) & "\"
+                        Dim LongRevision As Integer
+                        Dim RutaImagen As String
+                        LongRevision = Len(Revision)
+                        ' MessageBox.Show(LongRevision, "LongRevision")
+                        If LongRevision = 1 Then
+                            RutaImagen = RutaFija & Dir3 & Dir7 & fileName & "_R0" & Revision & ".png"
+                        Else
+                            RutaImagen = RutaFija & Dir3 & Dir7 & fileName & "_R" & Revision & ".png"
+                        End If
+                        ' MessageBox.Show(RutaImagen, "Ruta imagen")
+                        ' Dim rutaImagen As String = "C:\IMG\0_PNG\A10\A10.019\A10.019780.AACZYR_R0A.png"
+
+                        Dim proc = Process.GetProcessesByName("Rundll32")
+                        For i As Integer = 0 To proc.Count - 1
+                            proc(i).CloseMainWindow()
+                        Next i
+
+                        'Dim proceso As New Process()
+                        'proceso.StartInfo.FileName = "C:\Windows\System32\rundll32.exe"
+                        'proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & RutaImagen
+                        'proceso.Start()
+
+
+                        ' Verificar si el archivo de imagen existe en RutaImagen
+                        If System.IO.File.Exists(RutaImagen) Then
+                            ' El archivo de imagen existe, ejecutar el visor de imágenes
+                            Dim proceso As New Process()
+                            proceso.StartInfo.FileName = "C:\Windows\System32\rundll32.exe"
+                            proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & RutaImagen
+                            proceso.Start()
+                            'MessageBox.Show("Bloque de abajo.", "Bloque de abajo", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                        Else
+                            ' El archivo de imagen no existe, mostrar un mensaje o realizar otra acción
+                            MessageBox.Show("NO EXISTE IMAGEN DEL PLANO.", "IMAGEN NO ENCONTRADA", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                            ' MessageBox.Show("Bloque de abajo - else.", "Bloque de abajo - else", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                        End If
+
+
+
+
+
+
 
                     ElseIf selection.TypeId = SelectionTypeId.Item Then
                         ' our ISelection.Id is really a Item.MasterId
@@ -287,7 +372,8 @@ Namespace HelloWorld
 
                         Revision = revisionProp.Val.ToString()
                         ' MessageBox.Show(itemName, "ItemName")
-                        ' MessageBox.Show(Revision, "Num rev")
+                        'MessageBox.Show(Revision, "Num rev")
+
 
                         Dim RutaFija As String = "R:\DTECNIC\PLANOS\0_PNG\"
                         Dim Dir3 As String = Left(itemName, 3) & "\"
@@ -307,10 +393,94 @@ Namespace HelloWorld
                             proc(i).CloseMainWindow()
                         Next i
 
-                        Dim proceso As New Process()
-                        proceso.StartInfo.FileName = "C:\Windows\System32\rundll32.exe"
-                        proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & RutaImagen
-                        proceso.Start()
+                        'Dim proceso As New Process()
+                        'proceso.StartInfo.FileName = "C:\Windows\System32\rundll32.exe"
+                        'proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & RutaImagen
+                        'proceso.Start()
+
+                        ' Verificar si el archivo de imagen existe en RutaImagen
+                        If System.IO.File.Exists(RutaImagen) Then
+                            ' El archivo de imagen existe, ejecutar el visor de imágenes
+                            Dim proceso As New Process()
+                            proceso.StartInfo.FileName = "C:\Windows\System32\rundll32.exe"
+                            proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & RutaImagen
+                            proceso.Start()
+                            'MessageBox.Show("Bloque de abajo.", "Bloque de abajo", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                        Else
+                            ' El archivo de imagen no existe, mostrar un mensaje o realizar otra acción
+                            MessageBox.Show("NO EXISTE IMAGEN DEL PLANO.", "IMAGEN NO ENCONTRADA", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                            ' MessageBox.Show("Bloque de abajo - else.", "Bloque de abajo - else", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                        End If
+
+
+
+
+
+
+
+
+
+                    ElseIf selection.TypeId = SelectionTypeId.Bom Then
+
+                        selectedItem = mgr.ItemService.GetLatestItemByItemNumber(selection.Label)
+                        'MessageBox.Show("eureka", "LongRevision")
+
+
+                        ' Encontrar la definición de propiedad "Revision" para modelo ITEM
+                        revisionDef = mgr.PropertyService.FindPropertyDefinitionsBySystemNames("ITEM", New String() {"RevNumber"}).First()
+                        revisionProps = mgr.PropertyService.GetProperties("ITEM", New Long() {selectedItem.Id}, New Long() {revisionDef.Id})
+                        revisionProp = revisionProps.First()
+                        ' Mostrar el valor de la propiedad "Revision"
+                        ' MessageBox.Show(selectedItem.ItemNum & " - " & revisionProp.Val.ToString())
+                        itemName = selectedItem.ItemNum
+                        'itemName = Left(itemName, Len(itemName) - 4)
+
+                        Revision = revisionProp.Val.ToString()
+                        ' MessageBox.Show(itemName, "ItemName")
+                        ' MessageBox.Show(Revision, "Num rev")
+
+
+                        Dim RutaFija As String = "R:\DTECNIC\PLANOS\0_PNG\"
+                        Dim Dir3 As String = Left(itemName, 3) & "\"
+                        Dim Dir7 As String = Left(itemName, 7) & "\"
+                        Dim LongRevision As Integer
+                        Dim RutaImagen As String
+                        LongRevision = Len(Revision)
+                        ' MessageBox.Show(LongRevision, "LongRevision")
+                        If LongRevision = 1 Then
+                            RutaImagen = RutaFija & Dir3 & Dir7 & itemName & "_R0" & Revision & ".png"
+                        Else
+                            RutaImagen = RutaFija & Dir3 & Dir7 & itemName & "_R" & Revision & ".png"
+                        End If
+
+                        Dim proc = Process.GetProcessesByName("Rundll32")
+                        For i As Integer = 0 To proc.Count - 1
+                            proc(i).CloseMainWindow()
+                        Next i
+
+                        'Dim proceso As New Process()
+                        'proceso.StartInfo.FileName = "C:\Windows\System32\rundll32.exe"
+                        'proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & RutaImagen
+                        'proceso.Start()
+
+
+
+                        ' Verificar si el archivo de imagen existe en RutaImagen
+                        If System.IO.File.Exists(RutaImagen) Then
+                            ' El archivo de imagen existe, ejecutar el visor de imágenes
+                            Dim proceso As New Process()
+                            proceso.StartInfo.FileName = "C:\Windows\System32\rundll32.exe"
+                            proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & RutaImagen
+                            proceso.Start()
+                            'MessageBox.Show("Bloque de abajo.", "Bloque de abajo", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                        Else
+                            ' El archivo de imagen no existe, mostrar un mensaje o realizar otra acción
+                            MessageBox.Show("NO EXISTE IMAGEN DEL PLANO.", "IMAGEN NO ENCONTRADA", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                            ' MessageBox.Show("Bloque de abajo - else.", "Bloque de abajo - else", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                        End If
+
+
+
 
                     End If
 
