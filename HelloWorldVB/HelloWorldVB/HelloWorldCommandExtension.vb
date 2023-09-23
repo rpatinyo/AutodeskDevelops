@@ -74,10 +74,11 @@ Namespace HelloWorld
             ' Now the custom command is available in 3 places.
 
             'Gather the sites in a List.
-            Dim sites As New List(Of CommandSite)()
-            sites.Add(toolbarCmdSite)
-            sites.Add(fileContextCmdSite)
-            sites.Add(itemContextCmdSite)
+            Dim sites As New List(Of CommandSite) From {
+                toolbarCmdSite,
+                fileContextCmdSite,
+                itemContextCmdSite
+            }
 
             ' Return the list of CommandSites.
             Return sites
