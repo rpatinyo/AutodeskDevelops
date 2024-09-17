@@ -19,7 +19,7 @@ Imports VDF = Autodesk.DataManagement.Client.Framework
 <Assembly: Autodesk.Connectivity.Extensibility.Framework.ExtensionId("7ADC0766-F085-46d7-A2EB-C68F79CBF4E7")>
 
 ' This number gets incremented for each Vault release.
-<Assembly: Autodesk.Connectivity.Extensibility.Framework.ApiVersion("17.0")>
+<Assembly: Autodesk.Connectivity.Extensibility.Framework.ApiVersion("18.0")>
 
 Namespace HelloWorld
 
@@ -212,6 +212,7 @@ Namespace HelloWorld
                         revisionProp = revisionProps.First()
                         ' Mostrar el valor de la propiedad "Revision"
                         fileName = selectedFile.Name
+
                         fileName = Left(fileName, Len(fileName) - 4)
                         revisionNumber = revisionProp.Val.ToString()
                         If revisionNumber = "" Then
@@ -312,8 +313,8 @@ Namespace HelloWorld
             If System.IO.File.Exists(rutaImagen) Then
                 ' El archivo de imagen existe, ejecutar el visor de imágenes
                 Dim proceso As New Process()
-                proceso.StartInfo.FileName = "C:\Windows\System32\rundll32.exe"
-                proceso.StartInfo.Arguments = "C:\Windows\System32\shimgvw.dll,ImageView_Fullscreen " & rutaImagen
+                proceso.StartInfo.FileName = "C:\Program Files (x86)\FastStone Image Viewer\FSViewer.exe"
+                proceso.StartInfo.Arguments = rutaImagen
                 proceso.Start()
             Else
                 ' El archivo de imagen no existe, mostrar un mensaje o realizar otra acción
